@@ -1,0 +1,73 @@
+Folder PATH listing for volume OS
+Volume serial number is EA4D-761A
+C:.
+|   ARCHITECTURE.md
+|   QUICK_START.md
+|   structure.txt
+|   
++---Backend
+|   +---Config
+|   +---Controllers
+|   +---Jobs
+|   +---Middleware
+|   +---Models
+|   +---Routes
+|   +---Services
+|   +---Uploads
+|   |   \---receipts
+|   \---Utils
++---Documentation
+\---Frontend
+    \---src
+        +---Components
+        |   +---Auth
+        |   |   +---LoginForm
+        |   |   +---ProtectedRoute
+        |   |   \---RegisterForm
+        |   +---Budget
+        |   |   +---BudgetAlert
+        |   |   +---BudgetForm
+        |   |   +---BudgetList
+        |   |   \---BudgetProgress
+        |   +---Category
+        |   |   +---CategoryForm
+        |   |   \---CategoryList
+        |   +---Common
+        |   |   +---Button
+        |   |   +---Input
+        |   |   +---Loader
+        |   |   +---Modal
+        |   |   +---Select
+        |   |   \---Toast
+        |   +---Dashboard
+        |   |   +---Charts
+        |   |   +---DashboardCard
+        |   |   +---FinancialSummary
+        |   |   \---RecentTransactions
+        |   +---Layout
+        |   |   +---Footer
+        |   |   +---Navbar
+        |   |   \---Sidebar
+        |   +---Report
+        |   |   +---CategoryReport
+        |   |   +---ExportReport
+        |   |   \---MonthlyReport
+        |   \---Transaction
+        |       +---ReceiptUpload
+        |       +---TransactionFilter
+        |       +---TransactionForm
+        |       \---TransactionList
+        +---Config
+        +---Context
+        +---Hooks
+        +---Pages
+        |   +---BudgetsPage
+        |   +---DashboardPage
+        |   +---HomePage
+        |   +---LoginPage
+        |   +---NotFoundPage
+        |   +---ProfilePage
+        |   +---RegisterPage
+        |   +---ReportsPage
+        |   \---TransactionsPage
+        \---Services
