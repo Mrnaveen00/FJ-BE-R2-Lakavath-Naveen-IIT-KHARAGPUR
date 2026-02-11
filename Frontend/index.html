@@ -241,6 +241,12 @@
                             <textarea id="trans-description" placeholder="Add notes about this transaction..." rows="3"></textarea>
                         </div>
                         
+                        <div class="form-group">
+                            <label for="trans-receipt">Receipt (Optional)</label>
+                            <input type="file" id="trans-receipt" accept="image/*,.pdf">
+                            <small style="color: #666;">Upload receipt image or PDF (max 5MB)</small>
+                        </div>
+                        
                         <div class="form-buttons">
                             <button type="submit" class="btn-primary">Add Transaction</button>
                             <button type="button" onclick="hideAddTransactionForm()" class="btn-secondary">Cancel</button>
@@ -361,6 +367,9 @@
                         <select id="report-year" onchange="loadMonthlyReport()">
                         </select>
                     </div>
+                    <button onclick="downloadReportCSV()" class="btn-primary" style="height: fit-content;">
+                        📥 Download CSV
+                    </button>
                 </div>
                 
                 <!-- Monthly Report Chart -->

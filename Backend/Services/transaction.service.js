@@ -17,6 +17,7 @@ const getUserTransactions = async (userId, filters = {}) => {
                 t.amount,
                 t.transaction_date,
                 t.description,
+                t.receipt_path,
                 t.created_at,
                 t.updated_at,
                 c.id as category_id,
@@ -75,6 +76,7 @@ const getUserTransactions = async (userId, filters = {}) => {
             amount: parseFloat(row.amount),
             transaction_date: row.transaction_date,
             description: row.description,
+            receipt_path: row.receipt_path,
             created_at: row.created_at,
             updated_at: row.updated_at,
             Category: row.category_id ? {
@@ -96,7 +98,7 @@ const getUserTransactions = async (userId, filters = {}) => {
 // ==========================================
 const createTransaction = async (userId, transactionData) => {
     try {
-        const { type, category_id, amount, transaction_date, description } = transactionData;
+        const { type, category_id, amount, transaction_date, description, receipt_path } = transactionData;
         
         // Validate amount
         if (amount <= 0) {
@@ -106,10 +108,10 @@ const createTransaction = async (userId, transactionData) => {
         // Insert transaction
         const result = await db.query(
             `INSERT INTO transactions 
-             (id, user_id, type, category_id, amount, transaction_date, description, created_at, updated_at)
-             VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, NOW(), NOW())
-             RETURNING id, user_id, type, category_id, amount, transaction_date, description, created_at, updated_at`,
-            [userId, type, category_id, amount, transaction_date, description || null]
+             (id, user_id, type, category_id, amount, transaction_date, description, receipt_path, created_at, updated_at)
+             VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+             RETURNING id, user_id, type, category_id, amount, transaction_date, description, receipt_path, created_at, updated_at`,
+            [userId, type, category_id, amount, transaction_date, description || null, receipt_path || null]
         );
         
         const transaction = result.rows[0];
@@ -143,6 +145,7 @@ const getTransactionById = async (userId, transactionId) => {
                 t.amount,
                 t.transaction_date,
                 t.description,
+                t.receipt_path,
                 t.created_at,
                 t.updated_at,
                 c.id as category_id,
@@ -166,6 +169,7 @@ const getTransactionById = async (userId, transactionId) => {
             amount: parseFloat(row.amount),
             transaction_date: row.transaction_date,
             description: row.description,
+            receipt_path: row.receipt_path,
             created_at: row.created_at,
             updated_at: row.updated_at,
             Category: row.category_id ? {
@@ -185,7 +189,7 @@ const getTransactionById = async (userId, transactionId) => {
 // ==========================================
 const updateTransaction = async (userId, transactionId, updateData) => {
     try {
-        const { type, category_id, amount, transaction_date, description } = updateData;
+        const { type, category_id, amount, transaction_date, description, receipt_path } = updateData;
         
         // Check if transaction exists and belongs to user
         const existingResult = await db.query(
@@ -210,10 +214,11 @@ const updateTransaction = async (userId, transactionId, updateData) => {
                  amount = COALESCE($3, amount),
                  transaction_date = COALESCE($4, transaction_date),
                  description = COALESCE($5, description),
+                 receipt_path = COALESCE($6, receipt_path),
                  updated_at = NOW()
-             WHERE id = $6 AND user_id = $7
-             RETURNING id, user_id, type, category_id, amount, transaction_date, description, created_at, updated_at`,
-            [type, category_id, amount, transaction_date, description, transactionId, userId]
+             WHERE id = $7 AND user_id = $8
+             RETURNING id, user_id, type, category_id, amount, transaction_date, description, receipt_path, created_at, updated_at`,
+            [type, category_id, amount, transaction_date, description, receipt_path, transactionId, userId]
         );
         
         return result.rows[0];

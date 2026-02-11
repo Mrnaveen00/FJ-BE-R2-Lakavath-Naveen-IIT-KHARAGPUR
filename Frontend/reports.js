@@ -5,6 +5,7 @@
 
 // State
 let monthlyReportChart = null;
+let currentReportData = null;
 let currentReportYear = new Date().getFullYear();
 
 // ==========================================
@@ -95,6 +96,9 @@ async function loadMonthlyReport() {
 // ==========================================
 function displayMonthlyReport(reportData) {
     console.log('📊 Displaying monthly report:', reportData);
+    
+    // Store report data for CSV export
+    currentReportData = reportData;
     
     // Update summary cards
     updateReportSummary(reportData.summary);
@@ -266,7 +270,49 @@ function formatCurrency(amount) {
 }
 
 // ==========================================
+// DOWNLOAD REPORT AS CSV
+// ==========================================
+function downloadReportCSV() {
+    if (!currentReportData || !currentReportData.months || currentReportData.months.length === 0) {
+        showToast('No report data available to download', 'error');
+        return;
+    }
+    
+    const yearSelect = document.getElementById('report-year');
+    const year = yearSelect ? yearSelect.value : new Date().getFullYear();
+    
+    // Create CSV content
+    let csvContent = 'Month,Income,Expenses,Balance,Transactions\n';
+    
+    currentReportData.months.forEach(month => {
+        csvContent += `${month.monthName},${month.income},${month.expenses},${month.balance},${month.transactionCount}\n`;
+    });
+    
+    // Add summary row
+    csvContent += `\nSummary,,,,\n`;
+    csvContent += `Total Income,${currentReportData.summary.totalIncome},,,\n`;
+    csvContent += `Total Expenses,${currentReportData.summary.totalExpenses},,,\n`;
+    csvContent += `Net Balance,${currentReportData.summary.totalBalance},,,\n`;
+    
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `financial_report_${year}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast('✅ Report downloaded successfully', 'success');
+}
+
+// ==========================================
 // EXPORT FUNCTIONS FOR GLOBAL USE
 // ==========================================
 window.initializeReportsPage = initializeReportsPage;
 window.loadMonthlyReport = loadMonthlyReport;
+window.downloadReportCSV = downloadReportCSV;

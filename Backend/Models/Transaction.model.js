@@ -50,6 +50,10 @@ const Transaction = sequelize.define('Transaction', {
     description: {
         type: DataTypes.TEXT,
         allowNull: true
+    },
+    receipt_path: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'transactions',

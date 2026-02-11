@@ -247,6 +247,7 @@ function displayTransactions(transactionsList) {
         const type = transaction.type;
         const amount = parseFloat(transaction.amount);
         const description = transaction.description || '';
+        const hasReceipt = transaction.receipt_path ? true : false;
         
         // Use default icons based on transaction type
         const icon = type === 'income' ? '💰' : '💸';
@@ -260,11 +261,13 @@ function displayTransactions(transactionsList) {
                     <div class="transaction-title">${categoryName}</div>
                     <div class="transaction-date">${formattedDate}</div>
                     ${description ? `<div class="transaction-description">${description}</div>` : ''}
+                    ${hasReceipt ? `<div style="margin-top: 0.25rem;"><span style="font-size: 0.85rem; color: #28a745;">📎 Receipt attached</span></div>` : ''}
                 </div>
                 <div class="transaction-amount ${type}">
                     ${type === 'income' ? '+' : '-'}$${amount.toFixed(2)}
                 </div>
                 <div class="transaction-actions">
+                    ${hasReceipt ? `<button onclick="downloadReceipt('${transaction.id}')" class="btn-download" title="Download Receipt">📄</button>` : ''}
                     <button onclick="editTransaction('${transaction.id}')" class="btn-edit" title="Edit">
                         ✏️
                     </button>
@@ -367,6 +370,7 @@ async function handleAddTransaction(e) {
     const amount = document.getElementById('trans-amount').value;
     const transaction_date = document.getElementById('trans-date').value;
     const description = document.getElementById('trans-description').value;
+    const receiptFile = document.getElementById('trans-receipt').files[0];
     
     // Validation
     if (!type || !category_id || !amount || !transaction_date) {
@@ -380,7 +384,7 @@ async function handleAddTransaction(e) {
     }
     
     const isEditing = editingTransactionId !== null;
-    console.log(isEditing ? '✏️ Updating transaction' : '💳 Adding transaction:', { type, category_id, amount });
+    console.log(isEditing ? '✏️ Updating transaction' : '💳 Adding transaction:', { type, category_id, amount, hasReceipt: !!receiptFile });
     
     try {
         // Show loading state
@@ -395,19 +399,26 @@ async function handleAddTransaction(e) {
         
         const method = isEditing ? 'PUT' : 'POST';
         
+        // Use FormData to support file upload
+        const formData = new FormData();
+        formData.append('type', type);
+        formData.append('category_id', category_id);
+        formData.append('amount', parseFloat(amount));
+        formData.append('transaction_date', transaction_date);
+        formData.append('description', description || '');
+        
+        // Add receipt file if selected
+        if (receiptFile) {
+            formData.append('receipt', receiptFile);
+        }
+        
         const response = await fetch(url, {
             method: method,
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${token}`
+                // Don't set Content-Type header - let browser set it with boundary for multipart/form-data
             },
-            body: JSON.stringify({
-                type,
-                category_id,
-                amount: parseFloat(amount),
-                transaction_date,
-                description: description || null
-            })
+            body: formData
         });
         
         const data = await response.json();
@@ -574,12 +585,68 @@ function clearFilters() {
 }
 
 // ==========================================
+// DOWNLOAD RECEIPT
+// ==========================================
+async function downloadReceipt(transactionId) {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        showToast('Please login first', 'error');
+        return;
+    }
+    
+    try {
+        console.log('📄 Downloading receipt for transaction:', transactionId);
+        
+        const response = await fetch(`${API_URL}/transactions/${transactionId}/receipt`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (response.ok) {
+            // Get filename from Content-Disposition header or use default
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = 'receipt.pdf';
+            
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            // Create blob and download
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showToast('✅ Receipt downloaded', 'success');
+        } else {
+            const data = await response.json();
+            showToast(data.message || 'Failed to download receipt', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error downloading receipt:', error);
+        showToast('Unable to download receipt', 'error');
+    }
+}
+
+// ==========================================
 // EXPORT FUNCTIONS FOR GLOBAL USE
 // ==========================================
 window.showAddTransactionForm = showAddTransactionForm;
 window.hideAddTransactionForm = hideAddTransactionForm;
 window.editTransaction = editTransaction;
 window.deleteTransaction = deleteTransaction;
+window.downloadReceipt = downloadReceipt;
 window.clearFilters = clearFilters;
 window.showMoreTransactions = showMoreTransactions;
 window.initializeTransactionsPage = initializeTransactionsPage;

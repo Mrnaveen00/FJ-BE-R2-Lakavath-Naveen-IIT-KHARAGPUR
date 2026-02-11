@@ -56,10 +56,12 @@ const createTransaction = async (req, res) => {
     try {
         const userId = req.user.userId;
         const { type, category_id, amount, transaction_date, description } = req.body;
+        const receipt_path = req.file ? req.file.filename : null;
         
         console.log('📝 Create Transaction Request:', {
             userId,
-            body: req.body
+            body: req.body,
+            receipt: receipt_path
         });
         
         // Validation
@@ -88,14 +90,15 @@ const createTransaction = async (req, res) => {
             );
         }
         
-        console.log('💳 Creating transaction:', { type, category_id, amount });
+        console.log('💳 Creating transaction:', { type, category_id, amount, receipt_path });
         
         const transaction = await transactionService.createTransaction(userId, {
             type,
             category_id,
             amount: parseFloat(amount),
             transaction_date,
-            description
+            description,
+            receipt_path
         });
         
         console.log('✅ Transaction created successfully');
@@ -176,6 +179,7 @@ const updateTransaction = async (req, res) => {
         const userId = req.user.userId;
         const { id } = req.params;
         const { type, category_id, amount, transaction_date, description } = req.body;
+        const receipt_path = req.file ? req.file.filename : null;
         
         console.log('💳 Updating transaction:', id);
         
@@ -185,6 +189,7 @@ const updateTransaction = async (req, res) => {
         if (amount) updateData.amount = parseFloat(amount);
         if (transaction_date) updateData.transaction_date = transaction_date;
         if (description !== undefined) updateData.description = description;
+        if (receipt_path) updateData.receipt_path = receipt_path;
         
         const transaction = await transactionService.updateTransaction(
             userId,
@@ -264,10 +269,63 @@ const deleteTransaction = async (req, res) => {
     }
 };
 
+// ==========================================
+// DOWNLOAD RECEIPT
+// ==========================================
+const downloadReceipt = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { id } = req.params;
+        const path = require('path');
+        const fs = require('fs');
+        
+        console.log('📄 Download receipt for transaction:', id);
+        
+        const transaction = await transactionService.getTransactionById(userId, id);
+        
+        if (!transaction) {
+            return responseHandler.notFound(
+                res,
+                'Transaction not found'
+            );
+        }
+        
+        if (!transaction.receipt_path) {
+            return responseHandler.error(
+                res,
+                'No receipt found for this transaction',
+                404
+            );
+        }
+        
+        const filePath = path.join(__dirname, '..', 'Uploads', 'receipts', transaction.receipt_path);
+        
+        if (!fs.existsSync(filePath)) {
+            return responseHandler.error(
+                res,
+                'Receipt file not found',
+                404
+            );
+        }
+        
+        console.log('✅ Sending receipt file');
+        res.download(filePath);
+        
+    } catch (error) {
+        console.error('❌ Error in downloadReceipt:', error);
+        return responseHandler.error(
+            res,
+            'Failed to download receipt',
+            500
+        );
+    }
+};
+
 module.exports = {
     getTransactions,
     createTransaction,
     getTransactionById,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    downloadReceipt
 };
