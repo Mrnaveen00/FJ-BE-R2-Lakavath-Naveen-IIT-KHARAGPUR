@@ -26,10 +26,10 @@ const poolConfig = {
   // Connection retry settings
   allowExitOnIdle: false,     // Don't exit on idle connections
   
-  // SSL configuration (uncomment for production)
-  // ssl: {
-  //   rejectUnauthorized: false,
-  // },
+  // SSL configuration for production
+  ssl: process.env.NODE_ENV === 'production' ? {
+    rejectUnauthorized: false,
+  } : false,
 };
 
 // ==========================================
