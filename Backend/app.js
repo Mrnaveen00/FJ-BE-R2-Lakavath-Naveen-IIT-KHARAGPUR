@@ -9,7 +9,15 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:8000', 'http://localhost:5173', 'http://127.0.0.1:8000', 'http://localhost:8080', 'http://127.0.0.1:8080'],
+  origin: [
+    'http://localhost:8000', 
+    'http://localhost:5173', 
+    'http://127.0.0.1:8000', 
+    'http://localhost:8080', 
+    'http://127.0.0.1:8080',
+    'https://fj-be-r2-lakavath-naveen-iit-kharagpur-1wrs.onrender.com',
+    'https://fj-be-r2-lakavath-naveen-iit-kharagpur.onrender.com'
+  ],
   credentials: true,
 }));
 
