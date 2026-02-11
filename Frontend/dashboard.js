@@ -3,9 +3,6 @@
 // Handles dashboard data and UI
 // ==========================================
 
-// Configuration
-const DASHBOARD_API_URL = 'http://localhost:5000/api';
-
 // State
 let currentUser = null;
 let dashboardData = null;
@@ -43,7 +40,7 @@ async function loadUserProfile() {
     }
     
     try {
-        const response = await fetch(`${DASHBOARD_API_URL}/auth/profile`, {
+        const response = await fetch(`${API_URL}/auth/profile`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -85,7 +82,7 @@ async function loadDashboardData() {
     }
     
     try {
-        const response = await fetch(`${DASHBOARD_API_URL}/dashboard`, {
+        const response = await fetch(`${API_URL}/dashboard`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`

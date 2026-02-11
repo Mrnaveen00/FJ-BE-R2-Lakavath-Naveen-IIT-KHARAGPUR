@@ -3,8 +3,6 @@
 // Handles budget operations
 // ==========================================
 
-// Configuration
-const BUDGETS_API_URL = 'http://localhost:5000/api';
 
 // State
 let budgets = [];
@@ -45,7 +43,7 @@ async function loadBudgetCategories() {
     }
     
     try {
-        const response = await fetch(`${BUDGETS_API_URL}/categories`, {
+        const response = await fetch(`${API_URL}/categories`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -96,7 +94,7 @@ async function loadBudgets() {
     }
     
     try {
-        const response = await fetch(`${BUDGETS_API_URL}/budgets`, {
+        const response = await fetch(`${API_URL}/budgets`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -310,7 +308,7 @@ async function handleAddBudget(e) {
         submitBtn.textContent = 'Creating...';
         submitBtn.disabled = true;
         
-        const response = await fetch(`${BUDGETS_API_URL}/budgets`, {
+        const response = await fetch(`${API_URL}/budgets`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -368,7 +366,7 @@ async function deleteBudget(budgetId) {
     console.log('🗑️ Deleting budget:', budgetId);
     
     try {
-        const response = await fetch(`${BUDGETS_API_URL}/budgets/${budgetId}`, {
+        const response = await fetch(`${API_URL}/budgets/${budgetId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`

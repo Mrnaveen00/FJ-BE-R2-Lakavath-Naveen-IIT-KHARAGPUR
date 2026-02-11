@@ -3,9 +3,6 @@
 // Handles financial reports and analytics
 // ==========================================
 
-// Configuration
-const REPORTS_API_URL = 'http://localhost:5000/api';
-
 // State
 let monthlyReportChart = null;
 let currentReportYear = new Date().getFullYear();
@@ -71,7 +68,7 @@ async function loadMonthlyReport() {
     console.log(`📊 Loading monthly report for year: ${year}`);
     
     try {
-        const response = await fetch(`${REPORTS_API_URL}/reports/monthly?year=${year}`, {
+        const response = await fetch(`${API_URL}/reports/monthly?year=${year}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`

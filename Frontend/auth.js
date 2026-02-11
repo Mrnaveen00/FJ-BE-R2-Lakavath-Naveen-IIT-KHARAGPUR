@@ -3,9 +3,6 @@
 // Handles login and registration
 // ==========================================
 
-// Configuration
-const API_URL = 'http://localhost:5000/api';
-
 // State Management
 let token = localStorage.getItem('token');
 

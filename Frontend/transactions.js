@@ -3,8 +3,6 @@
 // Handles transaction operations
 // ==========================================
 
-// Configuration
-const TRANSACTIONS_API_URL = 'http://localhost:5000/api';
 
 // State
 let categories = [];
@@ -64,7 +62,7 @@ async function loadCategories() {
     
     try {
         console.log('📂 Fetching categories from API...');
-        const response = await fetch(`${TRANSACTIONS_API_URL}/categories`, {
+        const response = await fetch(`${API_URL}/categories`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -101,7 +99,7 @@ async function initializeDefaultCategories() {
     try {
         console.log('🔧 Initializing default categories...');
         
-        const response = await fetch(`${TRANSACTIONS_API_URL}/categories/initialize`, {
+        const response = await fetch(`${API_URL}/categories/initialize`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -184,7 +182,7 @@ async function loadTransactions() {
         
         console.log('💳 Loading transactions...');
         
-        const response = await fetch(`${TRANSACTIONS_API_URL}/transactions${queryString}`, {
+        const response = await fetch(`${API_URL}/transactions${queryString}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -392,8 +390,8 @@ async function handleAddTransaction(e) {
         submitBtn.disabled = true;
         
         const url = isEditing 
-            ? `${TRANSACTIONS_API_URL}/transactions/${editingTransactionId}`
-            : `${TRANSACTIONS_API_URL}/transactions`;
+            ? `${API_URL}/transactions/${editingTransactionId}`
+            : `${API_URL}/transactions`;
         
         const method = isEditing ? 'PUT' : 'POST';
         
@@ -464,7 +462,7 @@ async function editTransaction(transactionId) {
     
     try {
         // Fetch transaction details
-        const response = await fetch(`${TRANSACTIONS_API_URL}/transactions/${transactionId}`, {
+        const response = await fetch(`${API_URL}/transactions/${transactionId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -532,7 +530,7 @@ async function deleteTransaction(transactionId) {
     console.log('🗑️ Deleting transaction:', transactionId);
     
     try {
-        const response = await fetch(`${TRANSACTIONS_API_URL}/transactions/${transactionId}`, {
+        const response = await fetch(`${API_URL}/transactions/${transactionId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
