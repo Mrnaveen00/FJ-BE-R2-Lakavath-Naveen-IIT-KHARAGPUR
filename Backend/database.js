@@ -40,4 +40,17 @@ const testConnection = async () => {
   }
 };
 
-module.exports = { sequelize, testConnection };
+// Add receipt_path column if it doesn't exist
+const addReceiptColumn = async () => {
+  try {
+    await sequelize.query(`
+      ALTER TABLE transactions 
+      ADD COLUMN IF NOT EXISTS receipt_path VARCHAR(255);
+    `);
+    console.log('✅ Receipt column checked/added');
+  } catch (error) {
+    console.warn('⚠️ Receipt column check:', error.message);
+  }
+};
+
+module.exports = { sequelize, testConnection, addReceiptColumn };

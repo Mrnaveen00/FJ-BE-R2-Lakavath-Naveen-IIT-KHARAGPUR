@@ -1,6 +1,6 @@
 require('dotenv').config();
 const app = require('./app');
-const { testConnection } = require('./database');
+const { testConnection, addReceiptColumn } = require('./database');
 const { syncDatabase } = require('./Models');
 const logger = require('./Utils/logger');
 
@@ -15,6 +15,9 @@ const startServer = async () => {
     // Sync database models (create tables if they don't exist)
     await syncDatabase({ alter: process.env.NODE_ENV === 'development' });
     logger.info('📊 Database tables synchronized');
+
+    // Add receipt column if missing
+    await addReceiptColumn();
 
     // Start listening
     app.listen(PORT, () => {
